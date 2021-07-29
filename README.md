@@ -44,7 +44,7 @@ The ARM template deploys:
   - Key Vault
   - Network Security Group
 
-  ## Private AKS Cluster
+## Private AKS Cluster
 
 As a best practice, you should always consider using a [private AKS cluster](https://docs.microsoft.com/en-us/azure/aks/private-clusters) in your production environment, or at least secure access to the API server, by using [authorized IP address ranges](https://docs.microsoft.com/en-us/azure/aks/api-server-authorized-ip-ranges) in Azure Kubernetes Service. When using a private AKS cluster, the API Server is only accessible from your virtual network, any peered virtual network, or on-premises network connected via S2S VPN or ExpressRoute to the virtual network hosting your AKS cluster. Any request to the API Server goes over the virtual network and does not traverse the internet. The API server endpoint has no public IP address. To manage the API server, you'll need to use a virtual machine that has access to the AKS cluster's virtual network. There are several options for establishing network connectivity to the private cluster.
 
