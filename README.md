@@ -1,5 +1,5 @@
 ---
-services: aks, app-service, container-registry, azure-monitor, storage, virtual-network, virtual-machines, private-link, templates
+services: aks, key-vault, container-registry, azure-monitor, storage, virtual-network, virtual-machines, private-link, templates
 author: paolosalvatori
 ---
 
