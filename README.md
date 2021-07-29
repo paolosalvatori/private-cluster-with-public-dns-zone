@@ -7,6 +7,45 @@ author: paolosalvatori
 
 This project can be used to deploy a [private AKS cluster with a Public DNS address](https://docs.microsoft.com/en-us/azure/aks/private-clusters#create-a-private-aks-cluster-with-a-public-dns-address) with [Dynamic allocation of IPs and enhanced subnet support](https://docs.microsoft.com/en-us/azure/aks/configure-azure-cni#dynamic-allocation-of-ips-and-enhanced-subnet-support-preview), [Azure Active Directory Pod Identity](https://docs.microsoft.com/en-us/azure/aks/use-azure-ad-pod-identity), and more. 
 
+## Architecture ##
+
+This sample provides an ARM templates to deploy the following topology two node pools.
+
+![Architecture](images/architecture.png)
+
+The ARM template deploys:
+
+- A private AKS cluster composed of a:
+  - System node pool hosting only critical system pods and services. The worker nodes have node taint which prevents application pods from beings scheduled on this node pool.
+  - User node pool hosting user workloads and artifacts.
+- A new virtual network with four subnets:
+  - AksSubnet: this subnet is used for the AKS cluster worker nodes. The VMSS of both the system and user node pools will be created in this subnet. You can change the ARM template to use a separate subnet for the two node pools. 
+  - PodSubnet: this subnet is used to allot private IP addresses to pods of both the system and user node pools. You can change the ARM template to use two separate subnets, respectively, for the pods of the system and user node pools.
+  - A subnet for Azure Bastion 
+  - A subnet for the Jumpbox virtual machine used to connect to the private AKS cluster and for the private endpoints.
+-  A user-defined managed identity used by the AKS cluster to create additional resources like load balancers and managed disks in Azure.
+- A private endpoint to API server hosted by an AKS-managed Azure subscription. The cluster can communicate with the API server exposed via a Private Link Service using a private endpoint.
+- An Azure Bastion resource that provides secure and seamless SSH connectivity to the Jumpbox virtual machine directly in the Azure portal over SSL
+- An Azure Container Registry (ACR) to build, store, and manage container images and artifacts in a private registry for all types of container deployments.
+- An Azure Key Vault used by workloads running on AKS to retrieve sensitive data such as secrets, keys, and certificates.
+- A private endpoint to the Blob Storage Account
+- A private endpoint to to Azure Container Registry (ACR)
+- A private endpoint to Key Vault
+- When the ACR sku is equal to Premium, a Private Endpoint is created to allow the private AKS cluster to access ACR via a private IP address. For more information, see [Connect privately to an Azure container registry using Azure Private Link](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-private-link).
+- A Private DNS Zone for the name resolution of the private endpoint to the Blob Storage Account
+- A Private DNS Zone for the name resolution of the private endpoint to Azure Container Registry (ACR)
+- A Private DNS Zone for the name resolution of the private endpoint to Key Vault
+- A Virtual Network Link between the virtual network hosting the cluster and the Private DNS Zone to let the cluster to use the CNAME and A records defined by the Private DNS Zone for the name resolution of the API server of the cluster.
+- A jumpbox virtual machine to manage the private AKS cluster.
+- A Log Analytics workspace to collect the diagnostics logs and metrics from:
+  - AKS cluster
+  - Jumpbox virtual machine
+  - Application Gateway
+  - Key Vault
+  - Network Security Group
+
+  ## Private AKS Cluster
+
 As a best practice, you should always consider using a [private AKS cluster](https://docs.microsoft.com/en-us/azure/aks/private-clusters) in your production environment, or at least secure access to the API server, by using [authorized IP address ranges](https://docs.microsoft.com/en-us/azure/aks/api-server-authorized-ip-ranges) in Azure Kubernetes Service. When using a private AKS cluster, the API Server is only accessible from your virtual network, any peered virtual network, or on-premises network connected via S2S VPN or ExpressRoute to the virtual network hosting your AKS cluster. Any request to the API Server goes over the virtual network and does not traverse the internet. The API server endpoint has no public IP address. To manage the API server, you'll need to use a virtual machine that has access to the AKS cluster's virtual network. There are several options for establishing network connectivity to the private cluster.
 
 - Create a virtual machine in the same virtual network as the private AKS cluster.
@@ -44,43 +83,6 @@ az aks command invoke -g <resourceGroup> -n <clusterName> \
 -c "helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo update && helm install my-release -f values.yaml bitnami/nginx" \
 -f values.yaml
 ```
-
-## Architecture ##
-
-This sample provides an ARM templates to deploy the following topology two node pools.
-
-![Architecture](images/architecture.png)
-
-The ARM template deploys:
-
-- A private AKS cluster composed of a:
-  - System node pool hosting only critical system pods and services. The worker nodes have node taint which prevents application pods from beings scheduled on this node pool.
-  - User node pool hosting user workloads and artifacts.
-- A new virtual network with four subnets:
-  - AksSubnet: this subnet is used for the AKS cluster worker nodes. The VMSS of both the system and user node pools will be created in this subnet. You can change the ARM template to use a separate subnet for the two node pools. 
-  - PodSubnet: this subnet is used to allot private IP addresses to pods of both the system and user node pools. You can change the ARM template to use two separate subnets, respectively, for the pods of the system and user node pools.
-  - A subnet for Azure Bastion 
-  - A subnet for the Jumpbox virtual machine used to connect to the private AKS cluster and for the private endpoints.
--  A user-defined managed identity used by the AKS cluster to create additional resources like load balancers and managed disks in Azure.
-- A private endpoint to API server hosted by an AKS-managed Azure subscription. The cluster can communicate with the API server exposed via a Private Link Service using a private endpoint.
-- An Azure Bastion resource that provides secure and seamless SSH connectivity to the Jumpbox virtual machine directly in the Azure portal over SSL
-- An Azure Container Registry (ACR) to build, store, and manage container images and artifacts in a private registry for all types of container deployments.
-- An Azure Key Vault used by workloads running on AKS to retrieve sensitive data such as secrets, keys, and certificates.
-- A private endpoint to the Blob Storage Account
-- A private endpoint to to Azure Container Registry (ACR)
-- A private endpoint to Key Vault
-- When the ACR sku is equal to Premium, a Private Endpoint is created to allow the private AKS cluster to access ACR via a private IP address. For more information, see [Connect privately to an Azure container registry using Azure Private Link](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-private-link).
-- A Private DNS Zone for the name resolution of the private endpoint to the Blob Storage Account
-- A Private DNS Zone for the name resolution of the private endpoint to Azure Container Registry (ACR)
-- A Private DNS Zone for the name resolution of the private endpoint to Key Vault
-- A Virtual Network Link between the virtual network hosting the cluster and the Private DNS Zone to let the cluster to use the CNAME and A records defined by the Private DNS Zone for the name resolution of the API server of the cluster.
-- A jumpbox virtual machine to manage the private AKS cluster.
-- A Log Analytics workspace to collect the diagnostics logs and metrics from:
-  - AKS cluster
-  - Jumpbox virtual machine
-  - Application Gateway
-  - Key Vault
-  - Network Security Group
 
 ## Dynamic Public IP Allocation
 A drawback with the traditional CNI is the exhaustion of pod IP addresses as the AKS cluster grows, resulting in the need to rebuild the entire cluster in a bigger subnet. The new [Dynamic IP Allocation](https://docs.microsoft.com/en-us/azure/aks/configure-azure-cni#dynamic-allocation-of-ips-and-enhanced-subnet-support-preview) capability in Azure CNI solves this problem by allotting pod IP addresses from a subnet separate from the subnet hosting the AKS cluster nodes. This feature offers the following benefits:
