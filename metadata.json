@@ -1,9 +1,9 @@
 {
     "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
     "type": "QuickStart",
-    "itemDisplayName": "Create a Private AKS Cluster",
-    "description": "This sample shows how to create a private AKS cluster in a virtual network along with a jumpbox virtual machine.",
-    "summary": "This template creates a virtual network, a private AKS cluster, a jumpbox virtual machine and a log analytics worspace.",
+    "itemDisplayName": "Create a Private AKS Cluster with a Public DNS Zone",
+    "description": "This sample shows how to deploy a private AKS cluster with a public DNS zone.",
+    "summary": "This sample shows how to deploy a private AKS cluster with a public DNS zone for the name resolution of the API server name to the private IP address of its private endpoint.",
     "githubUsername": "paolosalvatori",
-    "dateUpdated": "2020-09-18"
+    "dateUpdated": "2020-07-30"
 }
