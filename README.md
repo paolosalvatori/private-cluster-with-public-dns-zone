@@ -5,7 +5,7 @@ author: paolosalvatori
 
 # Create a Private AKS cluster with a Public DNS Zone
 
-This project can be used to deploy a [private AKS cluster with a Public DNS address](https://docs.microsoft.com/en-us/azure/aks/private-clusters#create-a-private-aks-cluster-with-a-public-dns-address) with [Dynamic allocation of IPs and enhanced subnet support](https://docs.microsoft.com/en-us/azure/aks/configure-azure-cni#dynamic-allocation-of-ips-and-enhanced-subnet-support-preview), [Azure Active Directory Pod Identity](https://docs.microsoft.com/en-us/azure/aks/use-azure-ad-pod-identity), and more. 
+This project can be used to deploy a [private AKS cluster with a Public DNS address](https://docs.microsoft.com/en-us/azure/aks/private-clusters#create-a-private-aks-cluster-with-a-public-dns-address) with [Dynamic allocation of IPs and enhanced subnet support](https://docs.microsoft.com/en-us/azure/aks/configure-azure-cni#dynamic-allocation-of-ips-and-enhanced-subnet-support-preview), [Azure Active Directory Pod Identity](https://docs.microsoft.com/en-us/azure/aks/use-azure-ad-pod-identity), and more. This [sample](https://github.com/paolosalvatori/private-aks-cluster) shows how to deploy a [private AKS cluster with a Private DNS address](https://docs.microsoft.com/en-us/azure/aks/private-clusters).
 
 ## Architecture ##
 
@@ -94,7 +94,15 @@ A drawback with the traditional CNI is the exhaustion of pod IP addresses as the
 
 ## Deployment ##
 
-You can use the `deploy.sh` Bash script to deploy the topology. Make sure to change the name of the AKS cluster in the `deploy.sh` Bash script and substitute the placeholders in the `azuredeploy.parameters.json` file with meaningful values. The following picture shows the resources deployed by the ARM template in the target resource group.
+You can use the `deploy.sh` Bash script to deploy the topology. Make sure to change the name of the AKS cluster in the `deploy.sh` Bash script and substitute the placeholders in the `azuredeploy.parameters.json` file with meaningful values. Also, make sure to enable the following public preview features before deploying the ARM template:
+
+- [PodSecurityPolicyPreview](https://docs.microsoft.com/en-us/azure/aks/use-pod-security-policies) 
+- [RunCommandPreview](https://docs.microsoft.com/en-us/azure/aks/private-clusters#options-for-connecting-to-the-private-cluster) - - [EnablePodIdentityPreview](https://docs.microsoft.com/en-us/azure/aks/use-azure-ad-pod-identity) 
+- [EnablePrivateClusterPublicFQDN](https://docs.microsoft.com/en-us/azure/aks/private-clusters#create-a-private-aks-cluster-with-a-public-dns-address) 
+- [PodSubnetPreview"](https://docs.microsoft.com/en-us/azure/aks/configure-azure-cni#dynamic-allocation-of-ips-and-enhanced-subnet-support-preview)
+
+
+The following picture shows the resources deployed by the ARM template in the target resource group.
 
 ![Resource Group](images/resourcegroup.png)
 
