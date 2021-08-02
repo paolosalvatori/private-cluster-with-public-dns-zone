@@ -88,7 +88,7 @@ done
 echo "Refreshing the registration of the Microsoft.ContainerService resource provider..."
 az provider register --namespace Microsoft.ContainerService
 echo "Microsoft.ContainerService resource provider registration successfully refreshed"
-exit
+
 # Get the last Kubernetes version available in the region
 kubernetesVersion=$(az aks get-versions --location $location --query orchestrators[-1].orchestratorVersion --output tsv)
 
