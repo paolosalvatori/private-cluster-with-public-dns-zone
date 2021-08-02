@@ -69,7 +69,7 @@ for aksExtension in ${aksExtensions[@]}; do
     echo "[$aksExtension] extension is already registered."
   fi
 done
-echo $registeringExtensions
+
 delay=1
 for aksExtension in ${registeringExtensions[@]}; do
   echo -n "Checking if [$aksExtension] extension is already registered..."
