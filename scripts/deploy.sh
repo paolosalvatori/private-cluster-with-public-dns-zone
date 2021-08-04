@@ -55,7 +55,7 @@ else
 fi
 
 # Registering AKS feature extensions
-aksExtensions=("PodSecurityPolicyPreview" "EventgridPreview" "RunCommandPreview" "EnablePodIdentityPreview " "UserAssignedIdentityPreview" "EnablePrivateClusterPublicFQDN" "PodSubnetPreview")
+aksExtensions=("AutoUpgradePreview" "PodSecurityPolicyPreview" "EventgridPreview" "RunCommandPreview" "EnablePodIdentityPreview " "UserAssignedIdentityPreview" "EnablePrivateClusterPublicFQDN" "PodSubnetPreview")
 registeringExtensions=()
 for aksExtension in ${aksExtensions[@]}; do
   echo "Checking if [$aksExtension] extension is already registered..."
